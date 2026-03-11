@@ -245,13 +245,20 @@ export function useSongBGM(initialOptions: BGMOptions = {}) {
      * Internal instrument factory
      */
     const createInstrument = (type: string, instVolume: number) => {
-      const gainNode = new Tone.Gain(Tone.dbToGain(instVolume)).connect(masterVol);
+      const offsets: Record<string, number> = {
+        synth: -8, piano: -4, acousticGuitar: -4, electricGuitar: -2,
+        bass: 4, pad: 8, brass: 2, pluck: -1, marimba: 12, strings: 0, drum: 6
+      };
+      const offset = offsets[type] || 0;
+      const finalVol = Math.min(instVolume + offset, 10);
+
+      const gainNode = new Tone.Gain(Tone.dbToGain(finalVol)).connect(masterVol);
       let inst: any;
       switch(type) {
         case 'piano': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle8" }, envelope: { attack: 0.005, decay: 1.2, sustain: 0.3, release: 0.8 } }); break;
-        case 'acousticGuitar': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "pwm", modulationFrequency: 0.2 }, envelope: { attack: 0.005, decay: 1.5, sustain: 0.2, release: 1 } }); break;
+        case 'acousticGuitar': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3.01, modulationIndex: 10, oscillator: { type: "triangle" }, envelope: { attack: 0.005, decay: 1.2, sustain: 0, release: 1.2 }, modulation: { type: "sine" }, modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }); break;
         case 'electricGuitar': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.5, modulationIndex: 2.5, oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.6, release: 0.5 }, modulation: { type: "square" } }); break;
-        case 'bass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1, modulationIndex: 3, oscillator: { type: "triangle" }, envelope: { attack: 0.005, decay: 0.6, sustain: 0.1, release: 0.8 }, modulation: { type: "sine" }, modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0 } }); break;
+        case 'bass': inst = new Tone.PolySynth(Tone.MonoSynth, { oscillator: { type: "sawtooth" }, filter: { Q: 2, type: "lowpass", rolloff: -24 }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.4 }, filterEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2, baseFrequency: 60, octaves: 4 } }); break;
         case 'pad': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 1.2, decay: 0.5, sustain: 0.8, release: 2.5 } }); break;
         case 'brass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.01, modulationIndex: 2, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 }, modulation: { type: "sine" } }); break;
         case 'pluck': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.002, decay: 0.8, sustain: 0, release: 0.4 } }); break;

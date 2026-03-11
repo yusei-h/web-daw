@@ -5,6 +5,7 @@ export interface InstrumentConfig {
   name: string;
   type: InstrumentType;
   defaultVolume: number;
+  baseVolumeOffset: number; // 内部的な音量調整（UIスライダーの一貫性を保つため）
   icon: string;
   theme: string;
 }
@@ -23,63 +24,72 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
   synth: {
     name: "シンセリード",
     type: "melodic",
-    defaultVolume: -14,
+    defaultVolume: -6,
+    baseVolumeOffset: -8, // 元の-14に合わせる (-6 + (-8) = -14)
     icon: "🎹",
     theme: "theme-blue",
   },
   piano: {
     name: "エレピ",
     type: "melodic",
-    defaultVolume: -10,
+    defaultVolume: -8,
+    baseVolumeOffset: -4, // -10
     icon: "🎹",
     theme: "theme-emerald",
   },
   acousticGuitar: {
     name: "アコギ",
     type: "melodic",
-    defaultVolume: -20,
+    defaultVolume: -6,
+    baseVolumeOffset: -4, // アコギの音色を変更するため、いったん-10相当に設定
     icon: "🎸",
     theme: "theme-orange",
   },
   electricGuitar: {
     name: "エレキ",
     type: "melodic",
-    defaultVolume: -8,
+    defaultVolume: -6,
+    baseVolumeOffset: -2, // -8
     icon: "🎸",
     theme: "theme-blue",
   },
   bass: {
     name: "ベース",
     type: "melodic",
-    defaultVolume: 15,
+    defaultVolume: -6,
+    baseVolumeOffset: 4, // 15だと音割れするので、オシレータを変更して+4(-2相当)に抑制
     icon: "🎸",
     theme: "theme-purple",
   },
   pad: {
     name: "シンセパッド",
     type: "melodic",
-    defaultVolume: +2,
+    defaultVolume: -6,
+    baseVolumeOffset: 8, // +2
     icon: "☁️",
     theme: "theme-pink",
   },
   brass: {
     name: "ブラス",
     type: "melodic",
-    defaultVolume: -4,
+    defaultVolume: -6,
+    baseVolumeOffset: 2, // -4
     icon: "🎺",
     theme: "theme-red",
   },
   pluck: {
     name: "プラック",
     type: "melodic",
-    defaultVolume: -7,
+    defaultVolume: -6,
+    baseVolumeOffset: -1, // -7
     icon: "🪕",
     theme: "theme-teal",
   },
   marimba: {
     name: "マリンバ",
     type: "melodic",
-    defaultVolume: 6,
+    defaultVolume: -6,
+    baseVolumeOffset: 12, // 6
     icon: "🥢",
     theme: "theme-yellow",
   },
@@ -87,13 +97,15 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
     name: "ストリングス",
     type: "melodic",
     defaultVolume: -6,
+    baseVolumeOffset: 0, // -6
     icon: "🎻",
     theme: "theme-indigo",
   },
   drum: {
     name: "ドラムキット",
     type: "percussive",
-    defaultVolume: 0,
+    defaultVolume: -6,
+    baseVolumeOffset: 6, // 0
     icon: "🥁",
     theme: "theme-amber",
   },
@@ -105,7 +117,7 @@ export function createInstrumentInstance(
   volume: number
 ): InstrumentInstance {
   if (key === "drum") {
-    const gainNode = new Tone.Gain(Tone.dbToGain(volume)).toDestination();
+    const gainNode = new Tone.Gain(Tone.dbToGain(Math.min(volume + (INSTRUMENTS.drum.baseVolumeOffset || 0), 10))).toDestination();
     const kick = new Tone.MembraneSynth({
       pitchDecay: 0.05,
       octaves: 4,
@@ -167,10 +179,14 @@ export function createInstrumentInstance(
       });
       break;
     case "acousticGuitar":
-      // アコギ プラック感のある減衰音
-      synth = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: "pwm", modulationFrequency: 0.2 },
-        envelope: { attack: 0.005, decay: 1.5, sustain: 0.2, release: 1 },
+      // アコギ: FMSynthで弦を弾く鋭いアタック(金属弦の響き)と自然な減衰をシミュレート
+      synth = new Tone.PolySynth(Tone.FMSynth, {
+        harmonicity: 3.01,
+        modulationIndex: 10,
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.005, decay: 1.2, sustain: 0, release: 1.2 },
+        modulation: { type: "sine" },
+        modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
       });
       break;
     case "electricGuitar":
@@ -184,14 +200,12 @@ export function createInstrumentInstance(
       });
       break;
     case "bass":
-      // ベース: アコースティック/エレキベースに近い質感（弦を弾くアタックと減衰）
-      synth = new Tone.PolySynth(Tone.FMSynth, {
-        harmonicity: 1,
-        modulationIndex: 3,
-        oscillator: { type: "triangle" },
-        envelope: { attack: 0.005, decay: 0.6, sustain: 0.1, release: 0.8 },
-        modulation: { type: "sine" },
-        modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0 },
+      // ベース: MonoSynthを使ったサブトラクティブ・シンセで、音割れせずに太く聞こえるように
+      synth = new Tone.PolySynth(Tone.MonoSynth, {
+        oscillator: { type: "sawtooth" },
+        filter: { Q: 2, type: "lowpass", rolloff: -24 },
+        envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.4 },
+        filterEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2, baseFrequency: 60, octaves: 4 }
       });
       break;
     case "pad":
@@ -244,7 +258,9 @@ export function createInstrumentInstance(
       break;
   }
 
-  synth.volume.value = volume;
+  const offset = INSTRUMENTS[key].baseVolumeOffset || 0;
+  const finalVolume = volume + offset;
+  synth.volume.value = Math.min(finalVolume, 10); // 音割れ対策として最大+10dBに制限
   synth.toDestination();
 
   return {
