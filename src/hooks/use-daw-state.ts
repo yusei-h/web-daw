@@ -99,7 +99,8 @@ function dawReducer(state: DawState, action: DawAction): DawState {
               };
             });
           }
-          return { ...t, instrument: action.instrument, patterns };
+          const defaultVolume = INSTRUMENTS[action.instrument].defaultVolume;
+          return { ...t, instrument: action.instrument, volume: defaultVolume, patterns };
         }),
       };
     case "TOGGLE_TRACK_MUTE":

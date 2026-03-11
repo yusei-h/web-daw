@@ -11,7 +11,7 @@ export function useToneEngine(
   onSetPlayMode: (mode: PlayMode) => void,
   onSetPosition: (measure: number, step: number) => void
 ) {
-  const synthsRef = useRef<Map<string, InstrumentInstance>>(new Map());
+  const synthsRef = useRef<Map<string, { inst: InstrumentInstance; instrument: InstrumentKey }>>(new Map());
   const repeatEventIdRef = useRef<number | null>(null);
   const playheadStepRef = useRef(0);
   const lastStateRef = useRef(state);
@@ -29,28 +29,37 @@ export function useToneEngine(
   // トラッキング楽器インスタンスの同期
   useEffect(() => {
     const currentTrackIds = new Set(state.tracks.map((t) => t.id));
-    synthsRef.current.forEach((inst, id) => {
+    synthsRef.current.forEach((val, id) => {
       if (!currentTrackIds.has(id)) {
-        inst.dispose();
+        val.inst.dispose();
         synthsRef.current.delete(id);
       }
     });
 
     state.tracks.forEach((track) => {
       const existing = synthsRef.current.get(track.id);
-      if (!existing) {
-        const inst = createInstrumentInstance(track.instrument, track.volume);
-        synthsRef.current.set(track.id, inst);
+      
+      // 既存のインスタンスがあり、かつ楽器が変更されていない場合は何もしない
+      if (existing && existing.instrument === track.instrument) {
+        return;
       }
+
+      // 楽器が変更された、または新規トラックの場合は、古いインスタンスを破棄して再生成
+      if (existing) {
+        existing.inst.dispose();
+      }
+
+      const inst = createInstrumentInstance(track.instrument, track.volume);
+      synthsRef.current.set(track.id, { inst, instrument: track.instrument });
     });
   }, [state.tracks]);
 
   // ボリュームおよびBPM同期
   useEffect(() => {
     state.tracks.forEach((track) => {
-      const inst = synthsRef.current.get(track.id);
-      if (inst) {
-        inst.setVolume(track.mute ? -Infinity : track.volume);
+      const entry = synthsRef.current.get(track.id);
+      if (entry) {
+        entry.inst.setVolume(track.mute ? -Infinity : track.volume);
       }
     });
     Tone.Transport.bpm.value = state.bpm;
@@ -88,11 +97,11 @@ export function useToneEngine(
             const patternId = track.timeline[currentMeasure];
             if (!patternId) return;
             const pattern = track.patterns[patternId];
-            const inst = synthsRef.current.get(track.id);
-            if (pattern && inst) {
+            const entry = synthsRef.current.get(track.id);
+            if (pattern && entry) {
               const pitches = track.instrument === "drum" ? DRUM_PITCHES : MELODIC_PITCHES;
               const active = pitches.filter((p) => pattern.grid[p] && pattern.grid[p][localStep]);
-              if (active.length > 0) inst.triggerAttackRelease(active, "16n", time);
+              if (active.length > 0) entry.inst.triggerAttackRelease(active, "16n", time);
             }
           });
 
@@ -108,11 +117,11 @@ export function useToneEngine(
 
           if (track && patternId && !track.mute) {
             const pattern = track.patterns[patternId];
-            const inst = synthsRef.current.get(track.id);
-            if (pattern && inst) {
+            const entry = synthsRef.current.get(track.id);
+            if (pattern && entry) {
               const pitches = track.instrument === "drum" ? DRUM_PITCHES : MELODIC_PITCHES;
               const active = pitches.filter((p) => pattern.grid[p] && pattern.grid[p][localStep]);
-              if (active.length > 0) inst.triggerAttackRelease(active, "16n", time);
+              if (active.length > 0) entry.inst.triggerAttackRelease(active, "16n", time);
             }
           }
 
@@ -130,11 +139,11 @@ export function useToneEngine(
             const patternId = track.timeline[currentMeasure];
             if (!patternId) return;
             const pattern = track.patterns[patternId];
-            const inst = synthsRef.current.get(track.id);
-            if (pattern && inst) {
+            const entry = synthsRef.current.get(track.id);
+            if (pattern && entry) {
               const pitches = track.instrument === "drum" ? DRUM_PITCHES : MELODIC_PITCHES;
               const active = pitches.filter((p) => pattern.grid[p] && pattern.grid[p][localStep]);
-              if (active.length > 0) inst.triggerAttackRelease(active, "16n", time);
+              if (active.length > 0) entry.inst.triggerAttackRelease(active, "16n", time);
             }
           });
 
@@ -169,7 +178,7 @@ export function useToneEngine(
   // クリーンアップ
   useEffect(() => {
     return () => {
-      synthsRef.current.forEach((inst) => inst.dispose());
+      synthsRef.current.forEach((val) => val.inst.dispose());
       Tone.Transport.stop();
       if (repeatEventIdRef.current !== null) {
         Tone.Transport.clear(repeatEventIdRef.current);

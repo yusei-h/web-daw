@@ -23,56 +23,56 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
   synth: {
     name: "シンセリード",
     type: "melodic",
-    defaultVolume: -4,
+    defaultVolume: -14,
     icon: "🎹",
     theme: "theme-blue",
   },
   piano: {
     name: "エレピ",
     type: "melodic",
-    defaultVolume: -2,
+    defaultVolume: -10,
     icon: "🎹",
     theme: "theme-emerald",
   },
   bass: {
     name: "ベース",
     type: "melodic",
-    defaultVolume: -2,
+    defaultVolume: -14,
     icon: "🎸",
     theme: "theme-purple",
   },
   pad: {
     name: "シンセパッド",
     type: "melodic",
-    defaultVolume: -6,
+    defaultVolume: +2,
     icon: "☁️",
     theme: "theme-pink",
   },
   brass: {
     name: "ブラス",
     type: "melodic",
-    defaultVolume: -3,
+    defaultVolume: -4,
     icon: "🎺",
     theme: "theme-red",
   },
   pluck: {
     name: "プラック",
     type: "melodic",
-    defaultVolume: -2,
+    defaultVolume: -5,
     icon: "🪕",
     theme: "theme-teal",
   },
   marimba: {
     name: "マリンバ",
     type: "melodic",
-    defaultVolume: -1,
+    defaultVolume: 6,
     icon: "🥢",
     theme: "theme-yellow",
   },
   strings: {
     name: "ストリングス",
     type: "melodic",
-    defaultVolume: -5,
+    defaultVolume: -6,
     icon: "🎻",
     theme: "theme-indigo",
   },
@@ -84,6 +84,7 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
     theme: "theme-amber",
   },
 };
+
 
 export function createInstrumentInstance(
   key: InstrumentKey,
@@ -99,12 +100,12 @@ export function createInstrumentInstance(
     const snare = new Tone.NoiseSynth({
       noise: { type: "white" },
       envelope: { attack: 0.005, decay: 0.2, sustain: 0 },
-      volume: -2,
+      volume: -6,
     }).connect(gainNode);
     const hihat = new Tone.MetalSynth({
       envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
       resonance: 4000,
-      volume: -12,
+      volume: -16,
     }).connect(gainNode);
 
     let lastK = -1;
@@ -145,57 +146,65 @@ export function createInstrumentInstance(
   let synth: Tone.PolySynth;
   switch (key) {
     case "piano":
+      // ピアノ: 減衰が速い三角波。アタックを鋭く。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "triangle8" },
-        envelope: { attack: 0.02, decay: 1, sustain: 0.4, release: 1 },
+        envelope: { attack: 0.005, decay: 1.2, sustain: 0.3, release: 0.8 },
       });
       break;
     case "bass":
+      // ベース: 太い矩形波。低域に厚みを持たせる。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "square" },
-        envelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 0.2 },
+        envelope: { attack: 0.01, decay: 0.4, sustain: 0.4, release: 0.2 },
       });
       break;
     case "pad":
+      // パッド: 遅いアタックと長いリリース。包み込むような音。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "sine" },
-        envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 2 },
+        envelope: { attack: 1.2, decay: 0.5, sustain: 0.8, release: 2.5 },
       });
       break;
     case "brass":
+      // ブラス: FMSynthで金属的な質感を出し、デチューンされた鋸歯状波で厚みを出す。
       synth = new Tone.PolySynth(Tone.FMSynth, {
-        harmonicity: 1,
-        modulationIndex: 1.5,
+        harmonicity: 1.01,
+        modulationIndex: 2,
         oscillator: { type: "sawtooth" },
-        envelope: { attack: 0.05, decay: 0.2, sustain: 0.8, release: 0.5 },
+        envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 },
         modulation: { type: "sine" },
       });
       break;
     case "pluck":
+      // プラック: 非常に短いアタック。はじく音。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "triangle" },
-        envelope: { attack: 0.005, decay: 1, sustain: 0, release: 1 },
+        envelope: { attack: 0.002, decay: 0.8, sustain: 0, release: 0.4 },
       });
       break;
     case "marimba":
+      // マリンバ: AM合成で木琴のような打撃音を再現。
       synth = new Tone.PolySynth(Tone.AMSynth, {
         harmonicity: 3.2,
         oscillator: { type: "sine" },
-        envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.5 },
+        envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 },
         modulation: { type: "square" },
-        modulationEnvelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.2 },
       });
       break;
     case "strings":
+      // ストリングス: 複数のデチューンされた鋸歯状波でアンサンブル感を出す。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "sawtooth8" },
-        envelope: { attack: 0.3, decay: 0.1, sustain: 1, release: 1.5 },
+        envelope: { attack: 0.4, decay: 0.2, sustain: 0.9, release: 1.5 },
       });
       break;
     case "synth":
     default:
+      // デフォルトシンセ: 明るい鋸歯状波。
       synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "sawtooth" },
+        envelope: { attack: 0.01, decay: 0.1, sustain: 1, release: 0.5 },
       });
       break;
   }

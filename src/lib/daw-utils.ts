@@ -239,13 +239,13 @@ export function useSongBGM(initialOptions: BGMOptions = {}) {
       const gainNode = new Tone.Gain(Tone.dbToGain(instVolume)).connect(masterVol);
       let inst: any;
       switch(type) {
-        case 'piano': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle8" }, envelope: { attack: 0.02, decay: 1, sustain: 0.4, release: 1 } }); break;
-        case 'bass': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 0.2 } }); break;
-        case 'pad': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 2 } }); break;
-        case 'brass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1, modulationIndex: 1.5, oscillator: { type: "sawtooth" }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.8, release: 0.5 }, modulation: { type: "sine" } }); break;
-        case 'pluck': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.005, decay: 1, sustain: 0, release: 1 } }); break;
-        case 'marimba': inst = new Tone.PolySynth(Tone.AMSynth, { harmonicity: 3.2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.5 }, modulation: { type: "square" }, modulationEnvelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.2 } }); break;
-        case 'strings': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth8" }, envelope: { attack: 0.3, decay: 0.1, sustain: 1, release: 1.5 } }); break;
+        case 'piano': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle8" }, envelope: { attack: 0.005, decay: 1.2, sustain: 0.3, release: 0.8 } }); break;
+        case 'bass': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.4, release: 0.2 } }); break;
+        case 'pad': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 1.2, decay: 0.5, sustain: 0.8, release: 2.5 } }); break;
+        case 'brass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.01, modulationIndex: 2, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 }, modulation: { type: "sine" } }); break;
+        case 'pluck': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.002, decay: 0.8, sustain: 0, release: 0.4 } }); break;
+        case 'marimba': inst = new Tone.PolySynth(Tone.AMSynth, { harmonicity: 3.2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 }, modulation: { type: "square" } }); break;
+        case 'strings': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth8" }, envelope: { attack: 0.4, decay: 0.2, sustain: 0.9, release: 1.5 } }); break;
         case 'drum': 
           const kick = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, volume: 2 }).connect(gainNode);
           const snare = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0 }, volume: -2 }).connect(gainNode);
@@ -265,7 +265,7 @@ export function useSongBGM(initialOptions: BGMOptions = {}) {
             dispose: () => { kick.dispose(); snare.dispose(); hihat.dispose(); gainNode.dispose(); }
           };
         case 'synth':
-        default: inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth" } }); break;
+        default: inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.1, sustain: 1, release: 0.5 } }); break;
       }
       if (inst) {
         inst.connect(gainNode);
