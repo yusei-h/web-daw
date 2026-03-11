@@ -4,6 +4,8 @@ Web Studio DAW は、Next.js と Tone.js で構築された本格的なブラウ
 
 [English](README.md) | [日本語](README.ja.md)
 
+**ライブデモ**: [https://yusei-h.github.io/web-daw/](https://yusei-h.github.io/web-daw/)
+
 ## ✨ 主な機能
 
 - **アレンジャー (タイムライン)**: ドラッグ＆ドロップの簡単な操作で、複数のトラックとパターンを構築。
@@ -46,7 +48,14 @@ Web Studio DAW は、Next.js と Tone.js で構築された本格的なブラウ
    bun run dev
    ```
 
-4. ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
+4. ブラウザで [http://localhost:3000/web-daw/](http://localhost:3000/web-daw/) を開きます。（`basePath` 設定により開発時もパスが必要になります）
+
+### デプロイ
+
+このプロジェクトは **GitHub Pages** へのデプロイが設定されています。`main` ブランチへプッシュすると、GitHub Actions が自動的にビルドとデプロイを行います。
+
+1. リポジトリの設定（**Settings > Actions > General**）で GitHub Actions が有効になっていることを確認してください。
+2. **Settings > Pages** で、**Source** を **"GitHub Actions"** に設定してください。
 
 ## 📖 使い方
 

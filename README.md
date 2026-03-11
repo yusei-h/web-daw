@@ -4,6 +4,8 @@ Web Studio DAW is a professional, browser-based Digital Audio Workstation (DAW) 
 
 [English](README.md) | [日本語](README.ja.md)
 
+**Live Demo**: [https://yusei-h.github.io/web-daw/](https://yusei-h.github.io/web-daw/)
+
 ## ✨ Features
 
 - **Arranger (Timeline)**: Organize multiple tracks and patterns with an easy drag-and-drop interface.
@@ -46,7 +48,14 @@ Web Studio DAW is a professional, browser-based Digital Audio Workstation (DAW) 
    bun run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. Open [http://localhost:3000/web-daw/](http://localhost:3000/web-daw/) in your browser. (Note: use `/web-daw/` suffix in dev as well due to `basePath` config).
+
+### Deployment
+
+This project is configured for **GitHub Pages**. Any push to the `main` branch will automatically trigger the GitHub Actions workflow to build and deploy the app.
+
+1. Ensure **GitHub Actions** is enabled in your repository settings (**Settings > Actions > General**).
+2. Go to **Settings > Pages** and set the **Source** to **"GitHub Actions"**.
 
 ## 📖 Usage
 
