@@ -1,0 +1,65 @@
+import { Dictionary } from "./ja";
+
+export const en: Dictionary = {
+  header: {
+    title: "Web Studio DAW",
+    subtitle: "Create music intuitively and export as React code",
+    play: "Play All",
+    stop: "Stop",
+    bpm: "BPM",
+    measures: "Measures",
+  },
+  arranger: {
+    title: "Arranger (Timeline)",
+    helpClick: "🖱️ Left Click: Place",
+    helpDrag: "✋ Drag: Move (Alt key to Copy)",
+    addTrack: "Add Track",
+    patterns: "Patterns",
+    renameTrackPrompt: "Enter track name",
+    renamePatternPrompt: "Enter pattern name",
+  },
+  pianoRoll: {
+    editing: "Editing",
+    selectPattern: "Click a slot on the timeline to select a pattern.",
+    createPattern: "+ Create New Pattern",
+    clearPattern: "Clear All",
+    playPattern: "Play Pattern",
+    renamePattern: "Enter pattern name",
+  },
+  storage: {
+    title: "Browser Storage",
+    placeholder: "Enter song title",
+    save: "Save",
+    noSongs: "No saved songs found.",
+    load: "Load",
+    confirmDelete: "Are you sure you want to delete this song?",
+  },
+  importExport: {
+    title: "External Import / Export",
+    copyReact: "Copy Hook for BGM (React)",
+    copyJson: "Copy Project Data (JSON)",
+    importPlaceholder: "Paste JSON data here to restore project...",
+    restore: "Restore",
+    restoreSuccess: "Project restored successfully!",
+    restoreError: "Failed to parse data. Invalid JSON.",
+    copySuccessReact: "✓ React code copied to clipboard!",
+    copySuccessJson: "✓ Project data copied to clipboard.",
+  },
+  instruments: {
+    synth: "Synth Lead",
+    piano: "Electric Piano",
+    bass: "Bass Synth",
+    pad: "Synth Pad",
+    brass: "Synth Brass",
+    pluck: "Synth Pluck",
+    marimba: "Marimba",
+    strings: "Strings",
+    drum: "Drum Kit",
+  },
+  common: {
+    close: "Close",
+    cancel: "Cancel",
+    ok: "OK",
+    stop: "Stop",
+  }
+};

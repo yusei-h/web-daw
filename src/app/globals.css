@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+:root {
+  --background: #111827;
+  --foreground: #f3f4f6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* --- audio.html から移植されたスタイル --- */
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar { height: 10px; width: 10px; }
+::-webkit-scrollbar-track { background: #111827; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; border: 2px solid #111827; }
+::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+/* 楽器ごとのテーマカラー定義 */
+.theme-blue { --theme-color: #3b82f6; --theme-border: #2563eb; --theme-hover: #60a5fa; }
+.theme-emerald { --theme-color: #10b981; --theme-border: #059669; --theme-hover: #34d399; }
+.theme-purple { --theme-color: #8b5cf6; --theme-border: #7c3aed; --theme-hover: #a78bfa; }
+.theme-pink { --theme-color: #ec4899; --theme-border: #db2777; --theme-hover: #f472b6; }
+.theme-red { --theme-color: #ef4444; --theme-border: #dc2828; --theme-hover: #f87171; }
+.theme-teal { --theme-color: #14b8a6; --theme-border: #0d9488; --theme-hover: #2dd4bf; }
+.theme-yellow { --theme-color: #eab308; --theme-border: #ca8a04; --theme-hover: #facc15; }
+.theme-indigo { --theme-color: #6366f1; --theme-border: #4f46e5; --theme-hover: #818cf8; }
+.theme-amber { --theme-color: #f59e0b; --theme-border: #d97706; --theme-hover: #fbbf24; }
+
+/* ピアノロールのグリッドスタイル */
+.piano-roll {
+  display: grid;
+  grid-template-columns: 80px repeat(16, minmax(24px, 1fr));
+  gap: 1px;
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  user-select: none;
+}
+.key-label {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 12px; font-size: 0.75rem; font-weight: bold;
+  height: 30px; position: sticky; left: 0; z-index: 20;
+}
+.white-key { background-color: #f3f4f6; color: #111827; border-bottom: 1px solid #e5e7eb; }
+.black-key { background-color: #111827; color: #e5e7eb; border-bottom: 1px solid #374151;}
+.drum-key { background-color: #1f2937; color: #e5e7eb; border-right: 2px solid #111827; border-bottom: 1px solid #374151;}
+
+/* ピアノロールのマス目 (テーマカラー対応) */
+.cell { background-color: #374151; cursor: pointer; transition: background-color 0.05s; }
+.cell:hover { background-color: #4b5563; }
+.cell:nth-child(4n+1) { border-left: 2px solid #111827; }
+
+.piano-roll.themed .cell.active {
+  background-color: var(--theme-color);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+  border: 1px solid var(--theme-border);
+}
+.cell.playing-col { background-color: #4b5563; }
+.piano-roll.themed .cell.active.playing-col {
+  background-color: var(--theme-hover);
+  box-shadow: 0 0 15px var(--theme-color);
+  z-index: 10; position: relative; border-color: white;
+}
+
+/* タイムライン（アレンジャー）のスタイル */
+.timeline-grid {
+  display: grid;
+  grid-template-columns: 220px repeat(var(--total-measures, 8), minmax(60px, 1fr));
+  gap: 1px; background-color: #1f2937; border: 1px solid #374151; border-radius: 0.5rem; overflow-x: auto;
+  user-select: none;
+}
+.tl-header { 
+  background-color: #111827; color: #9ca3af; font-size: 0.75rem; text-align: center; 
+  padding: 4px; font-weight: bold; border-left: 1px solid #374151;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+}
+.tl-header:nth-child(4n+2) { color: #f3f4f6; } 
+.tl-header-interactive { cursor: pointer; transition: background-color 0.2s; }
+.tl-header-interactive:hover { background-color: #374151; }
+
+.tl-track-head { background-color: #1f2937; padding: 10px; border-right: 2px solid #111827; display: flex; flex-direction: column; gap: 6px; position: sticky; left: 0; z-index: 20;}
+.tl-track-head.themed-border { border-left: 4px solid var(--theme-color); }
+
+.tl-cell { background-color: #374151; position: relative; cursor: pointer; border-right: 1px dashed #4b5563;}
+.tl-cell:hover { background-color: #4b5563; }
+.tl-cell.playing-measure { background-color: #4b5563; box-shadow: inset 0 0 15px rgba(0,0,0,0.6); border: 1px solid #9ca3af;}
+
+/* 配置されたパターン（クリップ - テーマカラー対応） */
+.tl-clip {
+  position: absolute; top: 3px; bottom: 3px; left: 2px; right: 2px;
+  border-radius: 4px; 
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 0.75rem; font-weight: bold; color: white; cursor: grab;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: transform 0.1s;
+}
+.tl-clip.themed { background-color: var(--theme-color); border: 1px solid var(--theme-border); }
+.tl-clip:hover { transform: scale(0.98); filter: brightness(1.1); }
+.tl-clip:active { cursor: grabbing; transform: scale(0.95); }
+.tl-clip.themed.active-clip { 
+  background-color: var(--theme-hover); 
+  border: 2px solid #fff; z-index: 5;
+  box-shadow: 0 0 8px var(--theme-color);
+}
+
+/* レンジスライダーのカスタマイズ */
+input[type=range] { -webkit-appearance: none; background: transparent; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #9ca3af; cursor: pointer; margin-top: -4px; box-shadow: 0 0 2px rgba(0,0,0,0.5);}
+.tl-track-head.themed-border input[type=range]::-webkit-slider-thumb { background: var(--theme-color); }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #4b5563; border-radius: 2px; }
