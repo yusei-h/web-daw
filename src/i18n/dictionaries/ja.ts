@@ -46,6 +46,8 @@ export const ja = {
   instruments: {
     synth: "シンセリード",
     piano: "エレピ",
+    acousticGuitar: "アコギ",
+    electricGuitar: "エレキ",
     bass: "ベース",
     pad: "シンセパッド",
     brass: "ブラス",

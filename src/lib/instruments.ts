@@ -34,10 +34,24 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
     icon: "🎹",
     theme: "theme-emerald",
   },
+  acousticGuitar: {
+    name: "アコギ",
+    type: "melodic",
+    defaultVolume: -20,
+    icon: "🎸",
+    theme: "theme-orange",
+  },
+  electricGuitar: {
+    name: "エレキ",
+    type: "melodic",
+    defaultVolume: -8,
+    icon: "🎸",
+    theme: "theme-blue",
+  },
   bass: {
     name: "ベース",
     type: "melodic",
-    defaultVolume: -14,
+    defaultVolume: 15,
     icon: "🎸",
     theme: "theme-purple",
   },
@@ -58,7 +72,7 @@ export const INSTRUMENTS: Record<InstrumentKey, InstrumentConfig> = {
   pluck: {
     name: "プラック",
     type: "melodic",
-    defaultVolume: -5,
+    defaultVolume: -7,
     icon: "🪕",
     theme: "theme-teal",
   },
@@ -152,11 +166,32 @@ export function createInstrumentInstance(
         envelope: { attack: 0.005, decay: 1.2, sustain: 0.3, release: 0.8 },
       });
       break;
-    case "bass":
-      // ベース: 太い矩形波。低域に厚みを持たせる。
+    case "acousticGuitar":
+      // アコギ プラック感のある減衰音
       synth = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: "square" },
-        envelope: { attack: 0.01, decay: 0.4, sustain: 0.4, release: 0.2 },
+        oscillator: { type: "pwm", modulationFrequency: 0.2 },
+        envelope: { attack: 0.005, decay: 1.5, sustain: 0.2, release: 1 },
+      });
+      break;
+    case "electricGuitar":
+      // エレキ 歪みを持たせたオシレータ
+      synth = new Tone.PolySynth(Tone.FMSynth, {
+        harmonicity: 1.5,
+        modulationIndex: 2.5,
+        oscillator: { type: "sawtooth" },
+        envelope: { attack: 0.01, decay: 0.5, sustain: 0.6, release: 0.5 },
+        modulation: { type: "square" },
+      });
+      break;
+    case "bass":
+      // ベース: アコースティック/エレキベースに近い質感（弦を弾くアタックと減衰）
+      synth = new Tone.PolySynth(Tone.FMSynth, {
+        harmonicity: 1,
+        modulationIndex: 3,
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.005, decay: 0.6, sustain: 0.1, release: 0.8 },
+        modulation: { type: "sine" },
+        modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0 },
       });
       break;
     case "pad":
@@ -214,7 +249,28 @@ export function createInstrumentInstance(
 
   return {
     triggerAttackRelease: (notes, duration, time) => {
-      synth.triggerAttackRelease(notes, duration, time as any);
+      let finalNotes = notes;
+
+      // ベースの場合は、ピッチを2オクターブ下げる
+      if (key === "bass") {
+        const transpose = (note: string) => {
+          const match = note.match(/([A-G]#?)(\d+)/);
+          if (match) {
+            const pitch = match[1];
+            const octave = parseInt(match[2], 10);
+            return `${pitch}${Math.max(0, octave - 2)}`;
+          }
+          return note;
+        };
+
+        if (Array.isArray(notes)) {
+          finalNotes = notes.map(transpose);
+        } else {
+          finalNotes = transpose(notes as string);
+        }
+      }
+
+      synth.triggerAttackRelease(finalNotes, duration, time as any);
     },
     dispose: () => {
       synth.dispose();

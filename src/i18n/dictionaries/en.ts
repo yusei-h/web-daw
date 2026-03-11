@@ -48,7 +48,9 @@ export const en: Dictionary = {
   instruments: {
     synth: "Synth Lead",
     piano: "Electric Piano",
-    bass: "Bass Synth",
+    acousticGuitar: "Acoustic Guitar",
+    electricGuitar: "Electric Guitar",
+    bass: "Electric Bass",
     pad: "Synth Pad",
     brass: "Synth Brass",
     pluck: "Synth Pluck",

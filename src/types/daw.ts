@@ -1,6 +1,8 @@
 export type InstrumentKey =
   | "synth"
   | "piano"
+  | "acousticGuitar"
+  | "electricGuitar"
   | "bass"
   | "pad"
   | "brass"

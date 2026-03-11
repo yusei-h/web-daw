@@ -70,9 +70,18 @@ export function generateExportData(state: DawState) {
           if (pattern.grid[pitch] && pattern.grid[pitch][step]) {
             const beat = Math.floor(step / 4);
             const sixteenth = step % 4;
+            
+            let finalNote = pitch;
+            if (track.instrument === "bass") {
+              const match = finalNote.match(/([A-G]#?)(\d+)/);
+              if (match) {
+                finalNote = `${match[1]}${Math.max(0, parseInt(match[2], 10) - 2)}`;
+              }
+            }
+
             allNotes.push({
               time: `${measureIndex}:${beat}:${sixteenth}`,
-              note: pitch,
+              note: finalNote,
               duration: "16n",
             });
           }
@@ -240,7 +249,9 @@ export function useSongBGM(initialOptions: BGMOptions = {}) {
       let inst: any;
       switch(type) {
         case 'piano': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle8" }, envelope: { attack: 0.005, decay: 1.2, sustain: 0.3, release: 0.8 } }); break;
-        case 'bass': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.4, release: 0.2 } }); break;
+        case 'acousticGuitar': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "pwm", modulationFrequency: 0.2 }, envelope: { attack: 0.005, decay: 1.5, sustain: 0.2, release: 1 } }); break;
+        case 'electricGuitar': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.5, modulationIndex: 2.5, oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.6, release: 0.5 }, modulation: { type: "square" } }); break;
+        case 'bass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1, modulationIndex: 3, oscillator: { type: "triangle" }, envelope: { attack: 0.005, decay: 0.6, sustain: 0.1, release: 0.8 }, modulation: { type: "sine" }, modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0 } }); break;
         case 'pad': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 1.2, decay: 0.5, sustain: 0.8, release: 2.5 } }); break;
         case 'brass': inst = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.01, modulationIndex: 2, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 }, modulation: { type: "sine" } }); break;
         case 'pluck': inst = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.002, decay: 0.8, sustain: 0, release: 0.4 } }); break;
