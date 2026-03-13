@@ -255,15 +255,23 @@ function dawReducer(state: DawState, action: DawAction): DawState {
       return { ...state, songTitle: action.title };
     case "SET_POSITION":
       return { ...state, currentMeasure: action.measure, currentStep: action.step };
-    case "RESTORE_PROJECT":
+    case "RESTORE_PROJECT": {
+      const p = action.project as Partial<DawState>;
+      const newTracks = p.tracks || state.tracks;
+      const firstTrack = newTracks.length > 0 ? newTracks[0] : null;
+      const firstPatternId = firstTrack ? Object.keys(firstTrack.patterns)[0] : null;
+
       return {
         ...state,
-        ...action.project,
+        ...p,
+        activeTrackId: p.activeTrackId || (firstTrack ? firstTrack.id : null),
+        activePatternId: p.activePatternId || firstPatternId,
         playMode: "stopped",
         loopMeasureIndex: null,
         currentMeasure: 0,
         currentStep: 0,
       };
+    }
     default:
       return state;
   }

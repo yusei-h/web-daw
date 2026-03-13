@@ -6,6 +6,16 @@ export const ja = {
     stop: "停止中",
     bpm: "BPM",
     measures: "曲の長さ(小節)",
+    template: "テンプレート",
+    confirmTemplate: "現在のプロジェクトは破棄されてテンプレートが読み込まれます。よろしいですか？",
+    templates: {
+      basic: "基本 (Basic)",
+      edm: "EDM (ダンス)",
+      lofi: "Lo-Fi チル",
+      rock: "ロック",
+      jazz: "ジャズ",
+      "8bit": "8-Bit レトロ"
+    }
   },
   arranger: {
     title: "アレンジャー (タイムライン)",

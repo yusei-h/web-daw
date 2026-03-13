@@ -61,3 +61,13 @@ export interface SavedSong {
     | "currentStep"
   >;
 }
+
+export type TemplateData = Omit<
+  DawState,
+  | "playMode"
+  | "activeTrackId"
+  | "activePatternId"
+  | "loopMeasureIndex"
+  | "currentMeasure"
+  | "currentStep"
+>;

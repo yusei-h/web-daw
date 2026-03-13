@@ -8,6 +8,16 @@ export const en: Dictionary = {
     stop: "Stop",
     bpm: "BPM",
     measures: "Measures",
+    template: "Template",
+    confirmTemplate: "Current project will be overwritten. Are you sure?",
+    templates: {
+      basic: "Basic",
+      edm: "EDM",
+      lofi: "Lo-Fi Chill",
+      rock: "Rock",
+      jazz: "Jazz",
+      "8bit": "8-Bit Retro"
+    }
   },
   arranger: {
     title: "Arranger (Timeline)",

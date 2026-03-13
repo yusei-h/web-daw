@@ -2,6 +2,7 @@
 
 import { PlayMode } from "@/types/daw";
 import { useI18n } from "@/contexts/i18n-context";
+import { TemplateId } from "@/lib/templates";
 
 interface DawHeaderProps {
   bpm: number;
@@ -10,6 +11,7 @@ interface DawHeaderProps {
   onSetBpm: (bpm: number) => void;
   onSetTotalMeasures: (measures: number) => void;
   onTogglePlay: () => void;
+  onLoadTemplate: (templateId: TemplateId) => void;
 }
 
 export function DawHeader({
@@ -19,9 +21,19 @@ export function DawHeader({
   onSetBpm,
   onSetTotalMeasures,
   onTogglePlay,
+  onLoadTemplate,
 }: DawHeaderProps) {
   const isPlaying = playMode === "main";
   const { t, locale, setLocale } = useI18n();
+
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value as TemplateId;
+    if (!val) return;
+    if (confirm(t("header.confirmTemplate"))) {
+      onLoadTemplate(val);
+    }
+    e.target.value = ""; // 選択状態をリセット
+  };
 
   return (
     <header className="flex-none flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-gray-700 pb-4">
@@ -108,6 +120,25 @@ export function DawHeader({
             max="32"
             className="w-16 bg-gray-900 border border-gray-600 rounded-md px-2 py-1.5 text-white text-center text-sm font-mono focus:border-blue-500 focus:outline-none transition-colors"
           />
+        </div>
+
+        <div className="flex items-center gap-2 px-3 border-l border-gray-700">
+          <label className="text-xs text-gray-400 font-bold tracking-wider">
+            {t("header.template")}
+          </label>
+          <select
+            onChange={handleTemplateChange}
+            defaultValue=""
+            className="bg-gray-900 border border-gray-600 rounded-md px-2 py-1.5 text-white text-sm focus:border-blue-500 focus:outline-none transition-colors max-w-xs"
+          >
+            <option value="" disabled>-</option>
+            <option value="basic">{t("header.templates.basic")}</option>
+            <option value="edm">{t("header.templates.edm")}</option>
+            <option value="lofi">{t("header.templates.lofi")}</option>
+            <option value="rock">{t("header.templates.rock")}</option>
+            <option value="jazz">{t("header.templates.jazz")}</option>
+            <option value="8bit">{t("header.templates.8bit")}</option>
+          </select>
         </div>
       </div>
     </header>

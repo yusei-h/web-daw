@@ -8,6 +8,7 @@ import { ArrangerTimeline } from "@/components/arranger-timeline";
 import { PianoRoll } from "@/components/piano-roll";
 import { StoragePanel } from "@/components/storage-panel";
 import { ImportExportPanel } from "@/components/import-export-panel";
+import { TEMPLATES, TemplateId } from "@/lib/templates";
 
 export function DawApp() {
   const daw = useDawState();
@@ -28,6 +29,9 @@ export function DawApp() {
         onSetTotalMeasures={daw.setTotalMeasures}
         onTogglePlay={() => {
           togglePlay("main").catch(console.error);
+        }}
+        onLoadTemplate={(templateId: TemplateId) => {
+          daw.restoreProject(TEMPLATES[templateId]);
         }}
       />
 
