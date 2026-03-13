@@ -14,6 +14,8 @@ export const en: Dictionary = {
     helpClick: "🖱️ Left Click: Place",
     helpDrag: "✋ Drag: Move (Alt key to Copy)",
     addTrack: "Add Track",
+    muteTrack: "Mute",
+    deleteTrack: "Delete Track",
     patterns: "Patterns",
     renameTrackPrompt: "Enter track name",
     renamePatternPrompt: "Enter pattern name",

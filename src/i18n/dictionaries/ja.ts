@@ -12,6 +12,8 @@ export const ja = {
     helpClick: "🖱️ 左クリック: 配置",
     helpDrag: "✋ ドラッグ: 移動 (Altキーでコピー)",
     addTrack: "トラック追加",
+    muteTrack: "ミュート (消音)",
+    deleteTrack: "トラックを削除する",
     patterns: "パターン",
     renameTrackPrompt: "トラックの名前を入力してください",
     renamePatternPrompt: "パターンの名前を入力してください",
